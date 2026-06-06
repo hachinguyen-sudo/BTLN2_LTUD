@@ -20,7 +20,7 @@ def staff_required(view_func):
 @staff_required
 def dashboard_view(request):
     today = timezone.now().date()
-    
+
     stats = {
         'tong_booking':    Booking.objects.count(),
         'cho_xac_nhan':    Booking.objects.filter(status='pending').count(),
@@ -99,4 +99,4 @@ def toggle_review_view(request, review_id):
     return redirect('manage_reviews')
 
 
-#thiếu promotion.html
+

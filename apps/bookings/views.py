@@ -21,7 +21,7 @@ def booking_create_view(request, service_id):
             time_slot      = form.cleaned_data['time_slot']
             address        = form.cleaned_data['address']
             note           = form.cleaned_data['note']
-            promo_code     = form.cleaned_data['promotion_code'].strip()
+            promo_code     = form.cleaned_data.get('promotion_code', '').strip()
             payment_method = form.cleaned_data['method']
 
             # Bước 2: Kiểm tra overbooking
