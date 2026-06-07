@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="admin-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-label">Tổng quan</div>
+    <a href="{% url 'dashboard' %}" class="sidebar-link">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+    <div class="sidebar-label">Quản lý</div>
+    <a href="{% url 'manage_orders' %}" class="sidebar-link active">
+      <i class="bi bi-calendar-check"></i> Đơn đặt lịch
+    </a>
+    <a href="{% url 'manage_services' %}" class="sidebar-link">
+      <i class="bi bi-tools"></i> Dịch vụ
+    </a>
+    <a href="{% url 'manage_users' %}" class="sidebar-link">
+      <i class="bi bi-people"></i> Người dùng
+    </a>
+    <a href="{% url 'manage_reviews' %}" class="sidebar-link">
+      <i class="bi bi-star"></i> Đánh giá
+    </a>
+    <a href="{% url 'quan_ly_khuyen_mai' %}" class="sidebar-link">
+      <i class="bi bi-ticket-perforated"></i> Khuyến mãi
+    </a>
+    <div class="sidebar-label">Hệ thống</div>
+    <a href="{% url 'home' %}" class="sidebar-link">
+      <i class="bi bi-house"></i> Về trang chủ
+    </a>
+    <a href="{% url 'logout' %}" class="sidebar-link">
+      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="admin-page-title">
+      <i class="bi bi-calendar-check me-2"></i>Quản lý đơn đặt lịch
+    </div>
+
+    <!-- Bộ lọc -->
+    <div style="background:var(--cs-white);border:1px solid var(--cs-border);border-radius:var(--cs-radius-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+      <span style="font-family:var(--cs-font-display);font-weight:600;font-size:.88rem;color:var(--cs-text-muted);">
+        <i class="bi bi-funnel"></i> Lọc theo trạng thái:
+      </span>
+      <a href="{% url 'manage_orders' %}"
+         class="cs-badge {% if not status_filter %}cs-badge-primary{% else %}cs-badge-accent{% endif %}">
+        Tất cả
+      </a>
+      <a href="?status=pending"
+         class="cs-badge {% if status_filter == 'pending' %}cs-badge-primary{% else %}cs-badge-accent{% endif %}">
+        Chờ xác nhận
+      </a>
+      <a href="?status=confirmed"
+         class="cs-badge {% if status_filter == 'confirmed' %}cs-badge-primary{% else %}cs-badge-accent{% endif %}">
+        Đã xác nhận
+      </a>
+      <a href="?status=done"
+         class="cs-badge {% if status_filter == 'done' %}cs-badge-primary{% else %}cs-badge-accent{% endif %}">
+        Hoàn thành
+      </a>
+      <a href="?status=cancelled"
+         class="cs-badge {% if status_filter == 'cancelled' %}cs-badge-danger{% else %}cs-badge-accent{% endif %}">
+        Đã huỷ
+      </a>
+    </div>
+
+    <!-- Bảng đơn hàng -->
+    <div class="admin-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Khách hàng</th>
+            <th>Dịch vụ</th>
+            <th>Địa chỉ</th>
+            <th>Ngày</th>
+            <th>Giờ</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Cập nhật</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+          <tr>
+            <td><strong>#{{ b.id }}</strong></td>
+            <td>
+              <div style="font-weight:600;">{{ b.user.get_full_name|default:b.user.username }}</div>
+              {% if b.user.customerprofile.phone %}
+              <div style="font-size:.78rem;color:var(--cs-text-muted);">{{ b.user.customerprofile.phone }}</div>
+              {% endif %}
+            </td>
+            <td>{{ b.service.name }}</td>
+            <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {{ b.address }}, {{ b.district }}
+            </td>
+            <td>{{ b.booking_date }}</td>
+            <td>{{ b.time_slot }}</td>
+            <td style="font-weight:600;color:var(--cs-primary);">
+              {{ b.total_amount|floatformat:0 }}đ
+            </td>
+            <td>
+              <span class="status-{{ b.status }}">{{ b.get_status_display }}</span>
+            </td>
+            <td>
+              <form method="POST" action="{% url 'update_order_status' b.id %}" style="display:flex;gap:.4rem;align-items:center;">
+                {% csrf_token %}
+                <select name="status" class="form-select form-select-sm" style="font-size:.78rem;padding:.2rem .5rem;width:auto;">
+                  <option value="pending"   {% if b.status == 'pending'   %}selected{% endif %}>Chờ xác nhận</option>
+                  <option value="confirmed" {% if b.status == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+                  <option value="done"      {% if b.status == 'done'      %}selected{% endif %}>Hoàn thành</option>
+                  <option value="cancelled" {% if b.status == 'cancelled' %}selected{% endif %}>Đã huỷ</option>
+                </select>
+                <button type="submit" class="btn-cs-primary" style="padding:.25rem .65rem;font-size:.78rem;">
+                  <i class="bi bi-check2"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center" style="color:var(--cs-text-muted);padding:2.5rem;">
+              <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+              Không có đơn hàng nào.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+{% endblock %}

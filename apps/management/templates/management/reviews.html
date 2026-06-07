@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="admin-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-label">Tổng quan</div>
+    <a href="{% url 'dashboard' %}" class="sidebar-link">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+    <div class="sidebar-label">Quản lý</div>
+    <a href="{% url 'manage_orders' %}" class="sidebar-link">
+      <i class="bi bi-calendar-check"></i> Đơn đặt lịch
+    </a>
+    <a href="{% url 'manage_services' %}" class="sidebar-link">
+      <i class="bi bi-tools"></i> Dịch vụ
+    </a>
+    <a href="{% url 'manage_users' %}" class="sidebar-link">
+      <i class="bi bi-people"></i> Người dùng
+    </a>
+    <a href="{% url 'manage_reviews' %}" class="sidebar-link active">
+      <i class="bi bi-star"></i> Đánh giá
+    </a>
+    <a href="{% url 'quan_ly_khuyen_mai' %}" class="sidebar-link">
+      <i class="bi bi-ticket-perforated"></i> Khuyến mãi
+    </a>
+    <div class="sidebar-label">Hệ thống</div>
+    <a href="{% url 'home' %}" class="sidebar-link">
+      <i class="bi bi-house"></i> Về trang chủ
+    </a>
+    <a href="{% url 'logout' %}" class="sidebar-link">
+      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="admin-page-title">
+      <i class="bi bi-star me-2"></i>Quản lý đánh giá
+    </div>
+
+    <!-- Bảng đánh giá -->
+    <div class="admin-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Khách hàng</th>
+            <th>Dịch vụ</th>
+            <th>Điểm</th>
+            <th>Nội dung</th>
+            <th>Ngày gửi</th>
+            <th>Hiển thị</th>
+            <th>Duyệt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reviews %}
+          <tr>
+            <td><strong>#{{ r.id }}</strong></td>
+            <td>
+              <div style="font-weight:600;">
+                {{ r.booking.user.get_full_name|default:r.booking.user.username }}
+              </div>
+            </td>
+            <td>{{ r.booking.service.name }}</td>
+            <td>
+              <div style="color:#F5C842;font-size:1rem;letter-spacing:1px;">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}
+                {% endfor %}
+              </div>
+              <div style="font-size:.75rem;color:var(--cs-text-muted);">{{ r.rating }}/5</div>
+            </td>
+            <td style="max-width:200px;font-size:.85rem;color:var(--cs-text-muted);">
+              {{ r.comment|truncatechars:80|default:"—" }}
+            </td>
+            <td style="font-size:.82rem;">{{ r.created_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              {% if r.is_visible %}
+                <span class="status-confirmed">Đang hiện</span>
+              {% else %}
+                <span class="status-cancelled">Đang ẩn</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'toggle_review' r.id %}"
+                 class="btn-cs-outline"
+                 style="font-size:.78rem;padding:.25rem .7rem;">
+                {% if r.is_visible %}
+                  <i class="bi bi-eye-slash"></i> Ẩn
+                {% else %}
+                  <i class="bi bi-eye"></i> Duyệt hiện
+                {% endif %}
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center" style="color:var(--cs-text-muted);padding:2.5rem;">
+              <i class="bi bi-star" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+              Chưa có đánh giá nào.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+{% endblock %}

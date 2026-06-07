@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="cs-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-6 text-center">
+
+        <!-- Icon thành công -->
+        <div style="width:80px;height:80px;background:rgba(26,107,74,.1);
+                    border-radius:50%;display:flex;align-items:center;
+                    justify-content:center;margin:0 auto 1.5rem;">
+          <i class="bi bi-check-circle-fill"
+             style="font-size:2.5rem;color:var(--cs-primary);"></i>
+        </div>
+
+        <h2 style="font-family:var(--cs-font-display);font-weight:800;margin-bottom:.5rem;">
+          Đặt lịch thành công!
+        </h2>
+        <p style="color:var(--cs-text-muted);margin-bottom:2rem;">
+          Cảm ơn bạn đã sử dụng dịch vụ CleanSpace.
+          Chúng tôi sẽ liên hệ xác nhận sớm nhất.
+        </p>
+
+        <!-- Chi tiết đơn -->
+        <div class="cs-card p-4 text-start mb-4">
+          <h5 style="font-family:var(--cs-font-display);font-weight:700;
+                     margin-bottom:1.25rem;color:var(--cs-primary);">
+            <i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng
+          </h5>
+
+          <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Mã đơn</span>
+              <strong style="font-family:var(--cs-font-display);">#{{ booking.id }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Dịch vụ</span>
+              <strong>{{ booking.service.name }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Ngày thực hiện</span>
+              <strong>{{ booking.booking_date }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Khung giờ</span>
+              <strong>{{ booking.time_slot }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Địa chỉ</span>
+              <strong>{{ booking.address }}, {{ booking.district }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Hình thức TT</span>
+              <strong>{{ payment.get_method_display }}</strong>
+            </div>
+            {% if booking.promotion %}
+            <div style="display:flex;justify-content:space-between;
+                        padding-bottom:.75rem;border-bottom:1px solid var(--cs-border);">
+              <span style="color:var(--cs-text-muted);font-size:.88rem;">Khuyến mãi</span>
+              <span class="cs-badge cs-badge-accent">
+                {{ booking.promotion.code }} (-{{ booking.promotion.discount_percent }}%)
+              </span>
+            </div>
+            {% endif %}
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-family:var(--cs-font-display);font-weight:700;">Tổng thanh toán</span>
+              <span style="font-family:var(--cs-font-display);font-weight:800;
+                           font-size:1.2rem;color:var(--cs-primary);">
+                {{ payment.amount|floatformat:0 }}đ
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nút điều hướng -->
+        <div class="d-flex justify-content-center">
+          <a href="{% url 'home' %}" class="btn-cs-outline">
+            <i class="bi bi-house me-1"></i>Về trang chủ
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

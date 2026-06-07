@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="admin-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-label">Tổng quan</div>
+    <a href="{% url 'dashboard' %}" class="sidebar-link">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+    <div class="sidebar-label">Quản lý</div>
+    <a href="{% url 'manage_orders' %}" class="sidebar-link">
+      <i class="bi bi-calendar-check"></i> Đơn đặt lịch
+    </a>
+    <a href="{% url 'manage_services' %}" class="sidebar-link">
+      <i class="bi bi-tools"></i> Dịch vụ
+    </a>
+    <a href="{% url 'manage_users' %}" class="sidebar-link active">
+      <i class="bi bi-people"></i> Người dùng
+    </a>
+    <a href="{% url 'manage_reviews' %}" class="sidebar-link">
+      <i class="bi bi-star"></i> Đánh giá
+    </a>
+    <a href="{% url 'quan_ly_khuyen_mai' %}" class="sidebar-link">
+      <i class="bi bi-ticket-perforated"></i> Khuyến mãi
+    </a>
+    <div class="sidebar-label">Hệ thống</div>
+    <a href="{% url 'home' %}" class="sidebar-link">
+      <i class="bi bi-house"></i> Về trang chủ
+    </a>
+    <a href="{% url 'logout' %}" class="sidebar-link">
+      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="admin-page-title">
+      <i class="bi bi-people me-2"></i>Quản lý người dùng
+    </div>
+
+    <!-- Thống kê nhanh -->
+    <div style="background:var(--cs-white);border:1px solid var(--cs-border);border-radius:var(--cs-radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;display:inline-flex;align-items:center;gap:.65rem;">
+      <i class="bi bi-people-fill" style="color:var(--cs-primary);font-size:1.2rem;"></i>
+      <span style="font-family:var(--cs-font-display);font-weight:700;">
+        Tổng số: {{ users|length }} người dùng
+      </span>
+    </div>
+
+    <!-- Bảng người dùng -->
+    <div class="admin-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tên đăng nhập</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Ngày đăng ký</th>
+            <th>Số đơn</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td><strong>{{ forloop.counter }}</strong></td>
+            <td>
+              <div style="font-weight:600;font-family:var(--cs-font-display);">
+                {{ u.username }}
+              </div>
+            </td>
+            <td>{{ u.get_full_name|default:"—" }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              {% if u.customerprofile.phone %}
+                {{ u.customerprofile.phone }}
+              {% else %}
+                <span style="color:var(--cs-text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {% if u.customerprofile.address %}
+                {{ u.customerprofile.address }}
+              {% else %}
+                <span style="color:var(--cs-text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>{{ u.date_joined|date:"d/m/Y" }}</td>
+            <td>
+              <span class="cs-badge cs-badge-primary">
+                {{ u.booking_set.count }} đơn
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center" style="color:var(--cs-text-muted);padding:2.5rem;">
+              <i class="bi bi-people" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+              Chưa có người dùng nào.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+{% endblock %}

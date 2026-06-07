@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-4">
+        <div class="card p-4 shadow-lg border-0" style="border-radius: 20px;">
+            <h2 class="text-center mb-4 fw-bold" style="color: #1c6d2f;">Đăng nhập</h2>
+            
+            {% if error %}
+                <div class="alert alert-danger" style="border-radius: 10px;">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="text" name="username" class="form-control form-control-lg" placeholder="Tên đăng nhập" required style="border-radius: 10px;">
+                </div>
+                <div class="mb-3">
+                    <input type="password" name="password" class="form-control form-control-lg" placeholder="Mật khẩu" required style="border-radius: 10px;">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg border-0" style="background-color: #1c6d2f; border-radius: 10px; font-weight: 600;">
+                    Đăng nhập
+                </button>
+            </form>
+
+            <p class="text-center mt-4">
+                Chưa có tài khoản? 
+                <a href="{% url 'register' %}" class="login-register-link" style="text-decoration: none; color: #1c6d2f; font-weight: 600;">
+                    Đăng ký ngay!
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .login-register-link:hover { 
+        text-decoration: underline !important; 
+        color: #28a745 !important; 
+    }
+    .form-control:focus {
+        border-color: #1c6d2f !important;
+        box-shadow: 0 0 0 0.25rem rgba(28, 109, 47, 0.2) !important;
+    }
+</style>
+{% endblock %}

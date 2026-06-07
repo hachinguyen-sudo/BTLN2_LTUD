@@ -1,8 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import CustomerProfile
+from apps.bookings.models import Booking
+from django.contrib import messages
+from django.utils import timezone
 
 
 def register_view(request):
@@ -64,12 +67,42 @@ def logout_view(request):
 def profile_view(request):
     profile = CustomerProfile.objects.get(user=request.user)
     success = False
+    
     if request.method == 'POST':
         profile.phone   = request.POST.get('phone', '')
         profile.address = request.POST.get('address', '')
         profile.save()
         success = True
+        
+    my_bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
+
     return render(request, 'account/profile.html', {
-        'profile': profile,
-        'success': success,
-    })
+    'profile':  profile,
+    'bookings': Booking.objects.filter(user=request.user).order_by('-created_at'),
+    'success':  success,
+    'today':    timezone.now().date(),
+})
+
+
+
+
+def huy_don(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    
+    if request.method == 'POST':
+        today = timezone.now().date()
+        
+        # Chỉ cho huỷ nếu còn trước 1 ngày
+        if booking.booking_date <= today:
+            messages.error(request, 
+                f'Không thể huỷ đơn #{booking.id}. Chỉ được huỷ trước ngày thực hiện ít nhất 1 ngày.')
+        elif booking.status in ['cancelled', 'done']:
+            messages.error(request, 
+                f'Đơn #{booking.id} không thể huỷ do đã {booking.get_status_display()}.')
+        else:
+            booking.status = 'cancelled'
+            booking.save()
+            messages.success(request, 
+                f'Huỷ đơn #{booking.id} thành công!')
+    
+    return redirect('profile')

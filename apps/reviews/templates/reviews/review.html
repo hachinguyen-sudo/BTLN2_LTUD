@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+.rating-stars {
+  display: flex;
+  flex-direction: row-reverse; 
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.rating-stars input[type="radio"] {
+  display: none; 
+}
+.rating-stars label {
+  font-size: 2.2rem;
+  color: var(--cs-border);
+  cursor: pointer;
+  transition: color var(--cs-transition), transform var(--cs-transition);
+}
+
+.rating-stars input:checked ~ label,
+.rating-stars label:hover,
+.rating-stars label:hover ~ label {
+  color: var(--cs-accent); 
+}
+.rating-stars label:hover {
+  transform: scale(1.1);
+}
+</style>
+
+<div class="cs-breadcrumb">
+  <div class="container">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+      <li class="breadcrumb-item active">Đánh giá dịch vụ</li>
+    </ol>
+  </div>
+</div>
+
+<section class="cs-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-6">
+
+        <div class="text-center mb-4">
+          <span class="cs-label-tag"><i class="bi bi-star-fill"></i> Phản hồi</span>
+          <h2 style="font-family:var(--cs-font-display);font-weight:800;">
+            Đánh giá dịch vụ
+          </h2>
+          <p style="color:var(--cs-text-muted);">
+            Ý kiến của bạn giúp CleanSpace ngày càng hoàn thiện hơn
+          </p>
+        </div>
+
+        <div class="cs-card p-4 p-md-5 mb-5">
+          
+          {% if success %}
+            <div class="text-center py-4">
+              <div style="width:80px;height:80px;background:rgba(26,107,74,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                <i class="bi bi-check-circle-fill" style="font-size:2.5rem;color:var(--cs-primary);"></i>
+              </div>
+              <h4 style="font-family:var(--cs-font-display);font-weight:800;color:var(--cs-primary);">
+                Cảm ơn bạn đã đánh giá!
+              </h4>
+              <p style="color:var(--cs-text-muted); margin-bottom: 2rem;">
+                Phản hồi của bạn đã được ghi nhận. CleanSpace rất trân trọng sự đóng góp này!
+              </p>
+              <a href="{% url 'home' %}" class="btn-cs-outline">
+                <i class="bi bi-house me-2"></i>Về trang chủ
+              </a>
+            </div>
+
+          {% elif not done_bookings %}
+            <div class="text-center py-4">
+              <i class="bi bi-inbox text-muted" style="font-size:3rem;"></i>
+              <h5 class="mt-3" style="font-family:var(--cs-font-display);font-weight:700;">
+                Chưa có đơn hàng nào cần đánh giá
+              </h5>
+              <p style="color:var(--cs-text-muted);">
+                Bạn chỉ có thể đánh giá sau khi sử dụng và hoàn tất dịch vụ dọn dẹp của chúng tôi.
+              </p>
+              <a href="{% url 'services' %}" class="btn-cs-primary mt-3">
+                <i class="bi bi-calendar-plus me-2"></i>Đặt lịch ngay
+              </a>
+            </div>
+
+          {% else %}
+            
+            {% if error %}
+              <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endif %}
+
+            <form method="POST">
+              {% csrf_token %}
+
+              <div class="mb-4">
+                <label class="form-label" style="font-family:var(--cs-font-display);font-weight:700;">
+                  Bạn muốn đánh giá đơn hàng nào?
+                </label>
+                <select name="booking_id" class="form-select" style="padding:0.75rem 1rem;" required>
+                  <option value="">-- Chọn đơn dịch vụ đã hoàn thành --</option>
+                  {% for b in done_bookings %}
+                    <option value="{{ b.id }}">
+                      Mã #{{ b.id }} - {{ b.service.name }} (Ngày dọn: {{ b.booking_date|date:"d/m/Y" }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label d-block" style="font-family:var(--cs-font-display);font-weight:700;">
+                  Chất lượng dịch vụ (1 - 5 sao)
+                </label>
+                <div class="rating-stars">
+                  <input type="radio" name="rating" id="star5" value="5" required>
+                  <label for="star5" title="5 sao - Tuyệt vời"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" id="star4" value="4">
+                  <label for="star4" title="4 sao - Rất tốt"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" id="star3" value="3">
+                  <label for="star3" title="3 sao - Bình thường"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" id="star2" value="2">
+                  <label for="star2" title="2 sao - Tệ"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" id="star1" value="1">
+                  <label for="star1" title="1 sao - Rất tệ"><i class="bi bi-star-fill"></i></label>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label" style="font-family:var(--cs-font-display);font-weight:700;">
+                  Chia sẻ cảm nhận của bạn (Tùy chọn)
+                </label>
+                <textarea name="comment" class="form-control" rows="4" 
+                          placeholder="Nhân viên dọn dẹp có sạch sẽ không? Thái độ phục vụ như thế nào?..."></textarea>
+              </div>
+
+              <button type="submit" class="btn-cs-accent w-100 justify-content-center" style="padding:0.8rem;">
+                <i class="bi bi-send-fill me-2"></i>Gửi Đánh Giá
+              </button>
+            </form>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

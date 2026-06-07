@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="admin-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-label">Tổng quan</div>
+    <a href="{% url 'dashboard' %}" class="sidebar-link">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+    <div class="sidebar-label">Quản lý</div>
+    <a href="{% url 'manage_orders' %}" class="sidebar-link">
+      <i class="bi bi-calendar-check"></i> Đơn đặt lịch
+    </a>
+    <a href="{% url 'manage_services' %}" class="sidebar-link active">
+      <i class="bi bi-tools"></i> Dịch vụ
+    </a>
+    <a href="{% url 'manage_users' %}" class="sidebar-link">
+      <i class="bi bi-people"></i> Người dùng
+    </a>
+    <a href="{% url 'manage_reviews' %}" class="sidebar-link">
+      <i class="bi bi-star"></i> Đánh giá
+    </a>
+    <a href="{% url 'quan_ly_khuyen_mai' %}" class="sidebar-link">
+      <i class="bi bi-ticket-perforated"></i> Khuyến mãi
+    </a>
+    <div class="sidebar-label">Hệ thống</div>
+    <a href="{% url 'home' %}" class="sidebar-link">
+      <i class="bi bi-house"></i> Về trang chủ
+    </a>
+    <a href="{% url 'logout' %}" class="sidebar-link">
+      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="admin-page-title" style="margin:0;">
+        <i class="bi bi-tools me-2"></i>Quản lý dịch vụ
+      </div>
+      <!-- Thông báo -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3"
+         style="border-radius:var(--cs-radius);font-size:.88rem;">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+      <!-- Nút thêm dịch vụ → vào Django Admin -->
+      <a href="{% url 'them_dich_vu' %}" class="btn-cs-primary">
+  <i class="bi bi-plus-lg"></i> Thêm dịch vụ mới
+</a>
+    </div>
+
+    <!-- Bảng dịch vụ -->
+    <div class="admin-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Hình ảnh</th>
+            <th>Tên dịch vụ</th>
+            <th>Mô tả</th>
+            <th>Giá (VNĐ)</th>
+            <th>Thời gian</th>
+            <th>Trạng thái</th>
+            <th>Ẩn/Hiện</th>
+            <th>Sửa</th>     
+            <th>Xoá</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in services %}
+          <tr>
+            <td><strong>{{ forloop.counter }}</strong></td>
+            <td>
+              {% if s.image %}
+                <img src="{{ s.image.url }}" alt="{{ s.name }}"
+                     style="width:50px;height:50px;object-fit:cover;border-radius:8px;">
+              {% else %}
+                <div style="width:50px;height:50px;background:var(--cs-surface-2);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                  <i class="bi bi-image" style="color:var(--cs-text-muted);"></i>
+                </div>
+              {% endif %}
+            </td>
+            <td>
+              <div style="font-weight:600;font-family:var(--cs-font-display);">{{ s.name }}</div>
+            </td>
+            <td style="max-width:200px;color:var(--cs-text-muted);font-size:.85rem;">
+              {{ s.description|truncatechars:60 }}
+            </td>
+            <td style="font-weight:700;color:var(--cs-primary);">
+              {{ s.price|floatformat:0 }}đ
+            </td>
+            <td>{{ s.duration_hours }} giờ</td>
+            <td>
+              {% if s.is_active %}
+                <span class="status-confirmed">Đang hoạt động</span>
+              {% else %}
+                <span class="status-cancelled">Tạm ngưng</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'toggle_service' s.id %}"
+                 class="btn-cs-outline"
+                 style="font-size:.78rem;padding:.25rem .7rem;">
+                {% if s.is_active %}
+                  <i class="bi bi-eye-slash"></i> Ẩn
+                {% else %}
+                  <i class="bi bi-eye"></i> Hiện
+                {% endif %}
+              </a>
+               
+            </td>
+          
+
+<td>
+  <a href="{% url 'sua_dich_vu' s.id %}"
+     style="display:inline-flex;align-items:center;gap:.3rem;
+            background:none;border:1.5px solid #2563eb;
+            color:#2563eb;border-radius:999px;
+            padding:.2rem .75rem;font-size:.78rem;
+            font-weight:600;text-decoration:none;">
+    <i class="bi bi-pencil"></i> Sửa
+  </a>
+</td>
+
+
+<td>
+  <form method="POST" action="{% url 'xoa_dich_vu' s.id %}"
+        onsubmit="return confirm('Xoá dịch vụ {{ s.name }}?')">
+    {% csrf_token %}
+    <button type="submit"
+            style="background:none;border:1.5px solid var(--cs-danger);
+                   color:var(--cs-danger);border-radius:999px;
+                   padding:.2rem .75rem;font-size:.78rem;
+                   font-weight:600;cursor:pointer;">
+      <i class="bi bi-trash"></i> Xoá
+    </button>
+  </form>
+</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center" style="color:var(--cs-text-muted);padding:2.5rem;">
+              <i class="bi bi-tools" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+              Chưa có dịch vụ nào. <a href="/admin/services/service/add/">Thêm ngay</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+{% endblock %}

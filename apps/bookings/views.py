@@ -4,7 +4,8 @@ from django.utils import timezone
 from .models import Booking, Payment, Promotion
 from .forms import BookingForm                 
 from apps.services.models import Service
-
+from decimal import Decimal
+from django.http import JsonResponse
 
 @login_required(login_url='login')
 def booking_create_view(request, service_id):
@@ -51,7 +52,7 @@ def booking_create_view(request, service_id):
                 if not error:
                     # Bước 4: Tính tiền
                     if promotion:
-                        total = service.price * (1 - promotion.discount_percent / 100)
+                        total = service.price * (Decimal('1') - Decimal(promotion.discount_percent) / Decimal('100'))
                     else:
                         total = service.price
 
@@ -85,6 +86,7 @@ def booking_create_view(request, service_id):
         'service': service,
         'form':    form,                        
         'error':   error,
+        'gia_goc': service.price,
     })
 
 
@@ -99,20 +101,22 @@ def payment_success_view(request, booking_id):
     })
 
 
-def search_order_view(request):
-    booking = None
-    error   = None
-    if request.method == 'POST':
-        order_id = request.POST.get('order_id', '').strip()
-        phone    = request.POST.get('phone', '').strip()
-        try:
-            booking = Booking.objects.get(
-                id=order_id,
-                user__customerprofile__phone=phone
-            )
-        except Booking.DoesNotExist:
-            error = 'Không tìm thấy đơn hàng. Vui lòng kiểm tra lại.'
-    return render(request, 'bookings/search-order.html', {
-        'booking': booking,
-        'error':   error,
-    })
+
+
+
+def kiem_tra_ma_view(request):
+    code  = request.GET.get('code', '').strip()
+    today = timezone.now().date()
+    try:
+        promo = Promotion.objects.get(
+            code=code,
+            is_active=True,
+            start_date__lte=today,
+            end_date__gte=today
+        )
+        return JsonResponse({
+            'valid':            True,
+            'discount_percent': promo.discount_percent,
+        })
+    except Promotion.DoesNotExist:
+        return JsonResponse({'valid': False})

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .profile-card {
+        background: var(--cs-white);
+        border-radius: var(--cs-radius-lg);
+        padding: 30px;
+        box-shadow: var(--cs-shadow);
+        border: 1px solid var(--cs-border);
+        height: 100%;
+        /* Giúp 2 cột cao bằng nhau nhìn cho sang */
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: var(--cs-surface-2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--cs-primary);
+        margin: 0 auto 15px;
+    }
+
+    .btn-save {
+        background-color: var(--cs-primary);
+        color: white;
+        border-radius: var(--cs-radius-pill);
+        padding: 10px 20px;
+        border: none;
+        transition: var(--cs-transition);
+    }
+
+    .btn-save:hover {
+        background-color: var(--cs-primary-light);
+        color: white;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row g-4">
+
+        <div class="col-12 col-lg-4">
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <h4 class="text-center fw-bold mb-4" style="color: var(--cs-primary);">Hồ sơ cá nhân</h4>
+
+                {% if success %}
+                <div class="alert alert-success border-0 py-2 text-center"
+                    style="background: var(--cs-surface-2); color: var(--cs-primary); font-size: 0.9rem;">
+                    <i class="bi bi-check-circle-fill"></i> Cập nhật thành công!
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Tên đăng nhập</label>
+                        <input type="text" class="form-control" value="{{ user.username }}" readonly
+                            style="background: var(--cs-surface);">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Email</label>
+                        <input type="email" class="form-control" value="{{ user.email }}" readonly
+                            style="background: var(--cs-surface);">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small" style="color: var(--cs-primary);">Số điện thoại</label>
+                        <input type="text" name="phone" class="form-control" value="{{ profile.phone|default:'' }}"
+                            placeholder="Nhập số điện thoại...">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small" style="color: var(--cs-primary);">Địa chỉ</label>
+                        <textarea name="address" class="form-control" rows="2"
+                            placeholder="Nhập địa chỉ của bạn...">{{ profile.address|default:'' }}</textarea>
+                    </div>
+                    <div class="d-grid gap-3 mt-4">
+                        <button type="submit" class="btn btn-save">
+                            <i class="bi bi-save me-2"></i>Lưu thay đổi
+                        </button>
+
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger"
+                            style="border-radius: var(--cs-radius-pill); padding: 10px 20px; font-weight: 500;">
+                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất khỏi tài khoản
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+            <div class="profile-card">
+                <h4 class="fw-bold mb-4" style="color: var(--cs-primary);">
+                    <i class="bi bi-clock-history me-2"></i>Lịch sử đặt lịch
+                </h4>
+                <!-- Thông báo huỷ đơn -->
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3"
+                    style="border-radius:var(--cs-radius);font-size:.88rem;">
+                    {% if message.tags == 'success' %}
+                    <i class="bi bi-check-circle-fill me-2" style="color:var(--cs-primary);"></i>
+                    {% else %}
+                    <i class="bi bi-exclamation-circle-fill me-2" style="color:var(--cs-danger);"></i>
+                    {% endif %}
+                    {{ message }}
+                    {% if 'huỷ' in message|lower and 'thành công' in message|lower %}
+                    <br><span style="font-size:.82rem;">
+                        Nếu bạn đã chuyển khoản, vui lòng liên hệ
+                        <strong>1900 6768</strong> để được tư vấn hoàn tiền.
+                    </span>
+                    {% endif %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <div class="table-responsive"
+                    style="border-radius: var(--cs-radius); overflow: hidden; border: 1px solid var(--cs-border);">
+                    <table class="table align-middle mb-0" style="font-size: .88rem;">
+                        <thead style="background: var(--cs-surface-2);">
+                            <tr>
+                                <th class="p-3" style="color: var(--cs-text-muted);">Mã đơn</th>
+                                <th class="p-3" style="color: var(--cs-text-muted);">Dịch vụ</th>
+                                <th class="p-3" style="color: var(--cs-text-muted);">Ngày dọn</th>
+                                <th class="p-3" style="color: var(--cs-text-muted);">Khung giờ</th>
+                                <th class="p-3" style="color: var(--cs-text-muted);">Tổng tiền</th>
+                                <th class="p-3 text-center" style="color: var(--cs-text-muted);">Trạng thái</th>
+                                <th class="p-3 text-center" style="color: var(--cs-text-muted);">Huỷ đơn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+
+                            <tr>
+                                <td class="p-3"><strong>#{{ b.id }}</strong></td>
+                                <td class="p-3" style="font-weight: 500;">{{ b.service.name }}</td>
+                                <td class="p-3">{{ b.booking_date|date:"d/m/Y" }}</td>
+                                <td class="p-3">{{ b.time_slot }}</td>
+                                <td class="p-3" style="font-weight:700; color:var(--cs-primary);">{{ b.total_amount|floatformat:0 }}đ</td>
+                                <td class="p-3 text-center">
+                                    <span class="status-{{ b.status }}">
+                                        {{ b.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="p-3 text-center">
+                                    {% if b.status == 'pending' or b.status == 'confirmed' %}
+                                    {% if b.booking_date > today %}
+                                    <form method="POST" action="{% url 'huy_don' b.id %}"
+                                        onsubmit="return confirm('Huỷ đơn #{{ b.id }}?')">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background:none;border:1.5px solid var(--cs-danger);
+                               color:var(--cs-danger);border-radius:999px;
+                               padding:.2rem .75rem;font-size:.78rem;
+                               font-weight:600;cursor:pointer;">
+                                            <i class="bi bi-x-circle me-1"></i>Huỷ
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <span style="font-size:.78rem;color:var(--cs-text-muted);">Quá hạn huỷ</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span style="font-size:.78rem;color:var(--cs-text-muted);">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5" style="color:var(--cs-text-muted);">
+                                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                                    Bạn chưa có lịch đặt nào với CleanSpace.
+                                    <br>
+                                    <a href="{% url 'services' %}" class="btn btn-save mt-3"
+                                        style="padding: 8px 16px; font-size: 0.9rem;">
+                                        <i class="bi bi-calendar-plus me-1"></i> Đặt lịch ngay
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

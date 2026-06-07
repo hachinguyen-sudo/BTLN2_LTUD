@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container py-5">
+    <h2 class="text-center fw-bold mb-5">Danh mục dịch vụ</h2>
+    
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-6">
+            <form method="GET" action="{% url 'services' %}" class="d-flex gap-2">
+                <input type="text" name="q" class="form-control rounded-pill px-4" 
+                       placeholder="Tìm kiếm dịch vụ..." value="{{ query|default:'' }}">
+                <button class="btn btn-cs-primary rounded-pill px-4" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if services %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for service in services %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="ratio ratio-4x3">
+                    {% if service.image %}
+                        <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center"><span class="text-muted">No Image</span></div>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="fw-bold mb-3">{{ service.name }}</h5>
+                    <div class="mt-auto">
+                        <a href="{% url 'service_detail' service.id %}" class="btn btn-cs-outline w-100 mb-2">Xem chi tiết</a>
+                        <a href="{% url 'booking_create' service.id %}" class="btn btn-cs-primary w-100">Đặt lịch</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h4 class="text-muted">Không tìm thấy dịch vụ nào cho từ khóa: <strong>{{ query }}</strong></h4>
+        <a href="{% url 'services' %}" class="btn btn-cs-outline mt-3">Quay lại danh sách</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Review, Contact
-
+from .models import Review
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
@@ -10,14 +9,3 @@ class ReviewAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-
-
-@admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
-    list_display    = ['name', 'phone', 'email', 'is_read', 'created_at']
-    list_editable   = ['is_read']
-    readonly_fields = ['name', 'phone', 'email', 'message', 'created_at']
-
-    def has_add_permission(self, request):
-        return False
-    

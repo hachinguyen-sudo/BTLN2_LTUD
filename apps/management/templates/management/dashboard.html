@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+/* ── Admin Layout ── */
+.admin-wrapper {
+  display: flex;
+  min-height: calc(100vh - var(--cs-nav-height));
+}
+
+/* ── Sidebar ── */
+.admin-sidebar {
+  width: 240px;
+  background: var(--cs-primary-dark);
+  color: #fff;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  position: sticky;
+  top: var(--cs-nav-height);
+  height: calc(100vh - var(--cs-nav-height));
+  overflow-y: auto;
+}
+.sidebar-label {
+  font-family: var(--cs-font-display);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  padding: .75rem 1.25rem .35rem;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .55rem 1.25rem;
+  color: rgba(255,255,255,.65);
+  font-family: var(--cs-font-display);
+  font-size: .88rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--cs-transition);
+}
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--cs-accent);
+}
+.sidebar-link i { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ── Main content ── */
+.admin-main {
+  flex: 1;
+  padding: 2rem;
+  background: var(--cs-surface);
+  overflow-y: auto;
+}
+.admin-page-title {
+  font-family: var(--cs-font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--cs-text);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Stat cards ── */
+.stat-card {
+  background: var(--cs-white);
+  border: 1px solid var(--cs-border);
+  border-radius: var(--cs-radius-lg);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--cs-shadow-sm);
+}
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: var(--cs-radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.stat-icon.green  { background: rgba(26,107,74,.12); color: var(--cs-primary); }
+.stat-icon.yellow { background: rgba(245,200,66,.2); color: #7A6000; }
+.stat-icon.red    { background: rgba(217,64,64,.1);  color: var(--cs-danger); }
+.stat-icon.blue   { background: rgba(59,130,246,.1); color: #2563eb; }
+.stat-value {
+  font-family: var(--cs-font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cs-text);
+}
+.stat-label {
+  font-size: .82rem;
+  color: var(--cs-text-muted);
+  margin-top: .2rem;
+}
+
+/* ── Table ── */
+.admin-table {
+  background: var(--cs-white);
+  border-radius: var(--cs-radius-lg);
+  border: 1px solid var(--cs-border);
+  overflow: hidden;
+  box-shadow: var(--cs-shadow-sm);
+}
+.admin-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.admin-table thead th {
+  background: var(--cs-surface-2);
+  padding: .75rem 1rem;
+  font-family: var(--cs-font-display);
+  font-weight: 700;
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cs-text-muted);
+  border-bottom: 1px solid var(--cs-border);
+  white-space: nowrap;
+}
+.admin-table tbody td {
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--cs-border);
+  vertical-align: middle;
+  color: var(--cs-text);
+}
+.admin-table tbody tr:last-child td { border-bottom: none; }
+.admin-table tbody tr:hover { background: var(--cs-surface-2); }
+
+/* ── Status badges ── */
+.status-pending   { background: rgba(245,200,66,.2);  color: #7A6000;           padding: .2rem .65rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+.status-confirmed { background: rgba(26,107,74,.12);  color: var(--cs-primary); padding: .2rem .65rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+.status-cancelled { background: rgba(217,64,64,.1);   color: var(--cs-danger);  padding: .2rem .65rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+.status-done      { background: rgba(59,130,246,.1);  color: #2563eb;           padding: .2rem .65rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+</style>
+
+<div class="admin-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-label">Tổng quan</div>
+    <a href="{% url 'dashboard' %}" class="sidebar-link active">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </a>
+
+    <div class="sidebar-label">Quản lý</div>
+    <a href="{% url 'manage_orders' %}" class="sidebar-link">
+      <i class="bi bi-calendar-check"></i> Đơn đặt lịch
+    </a>
+    <a href="{% url 'manage_services' %}" class="sidebar-link">
+      <i class="bi bi-tools"></i> Dịch vụ
+    </a>
+    <a href="{% url 'manage_users' %}" class="sidebar-link">
+      <i class="bi bi-people"></i> Người dùng
+    </a>
+    <a href="{% url 'manage_reviews' %}" class="sidebar-link">
+      <i class="bi bi-star"></i> Đánh giá
+    </a>
+    <a href="{% url 'quan_ly_khuyen_mai' %}" class="sidebar-link">
+      <i class="bi bi-ticket-perforated"></i> Khuyến mãi
+    </a>
+
+    <div class="sidebar-label">Hệ thống</div>
+    <a href="{% url 'home' %}" class="sidebar-link">
+      <i class="bi bi-house"></i> Về trang chủ
+    </a>
+    <a href="{% url 'logout' %}" class="sidebar-link">
+      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="admin-page-title">
+      <i class="bi bi-grid-1x2 me-2"></i>Dashboard
+    </div>
+
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-calendar-check"></i></div>
+          <div>
+            <div class="stat-value">{{ stats.tong_booking }}</div>
+            <div class="stat-label">Tổng đơn đặt lịch</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="bi bi-clock-history"></i></div>
+          <div>
+            <div class="stat-value">{{ stats.cho_xac_nhan }}</div>
+            <div class="stat-label">Chờ xác nhận</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-calendar-day"></i></div>
+          <div>
+            <div class="stat-value">{{ stats.hom_nay }}</div>
+            <div class="stat-label">Lịch hôm nay</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-cash-coin"></i></div>
+          <div>
+            <div class="stat-value">{{ stats.tong_doanh_thu|floatformat:0 }}</div>
+            <div class="stat-label">Doanh thu (VNĐ)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Đơn mới nhất -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 style="font-family:var(--cs-font-display);font-weight:700;margin:0;">
+        Đơn đặt lịch mới nhất
+      </h5>
+      <a href="{% url 'manage_orders' %}" class="btn-cs-outline" style="font-size:.82rem;">
+        Xem tất cả <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="admin-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Khách hàng</th>
+            <th>Dịch vụ</th>
+            <th>Ngày</th>
+            <th>Khung giờ</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in booking_moi %}
+          <tr>
+            <td><strong>#{{ b.id }}</strong></td>
+            <td>{{ b.user.get_full_name|default:b.user.username }}</td>
+            <td>{{ b.service.name }}</td>
+            <td>{{ b.booking_date }}</td>
+            <td>{{ b.time_slot }}</td>
+            <td>
+              <span class="status-{{ b.status }}">
+                {{ b.get_status_display }}
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center" style="color:var(--cs-text-muted);padding:2rem;">
+              Chưa có đơn đặt lịch nào.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+{% endblock %}

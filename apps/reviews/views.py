@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Review, Contact
+from .models import Review
 from apps.bookings.models import Booking
 
 
@@ -41,15 +41,3 @@ def review_create_view(request):
         'done_bookings': done_bookings,
     })
 
-
-def contact_view(request):
-    success = False
-    if request.method == 'POST':
-        Contact.objects.create(
-            name=request.POST.get('name'),
-            phone=request.POST.get('phone'),
-            email=request.POST.get('email'),
-            message=request.POST.get('message'),
-        )
-        success = True
-    return render(request, 'reviews/contact.html', {'success': success})
