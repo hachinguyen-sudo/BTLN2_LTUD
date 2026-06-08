@@ -42,7 +42,7 @@
     </div>
     {% else %}
     <div class="text-center py-5">
-        <h4 class="text-muted">Không tìm thấy dịch vụ nào cho từ khóa: <strong>{{ query }}</strong></h4>
+        <h4 class="text-muted">Không tìm thấy dịch vụ nào {% if query and query != 'None' %}cho từ khóa: <strong>{{ query }}</strong>{% endif %}</h4>
         <a href="{% url 'services' %}" class="btn btn-cs-outline mt-3">Quay lại danh sách</a>
     </div>
     {% endif %}
