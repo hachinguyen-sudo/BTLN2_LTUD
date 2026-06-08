@@ -26,9 +26,10 @@
 
   --cs-shadow-sm:     0 2px 8px  rgba(26,107,74,.08);
   --cs-shadow:        0 6px 24px rgba(26,107,74,.12);
+  --cs-shadow-hover:  0 12px 32px rgba(26,107,74,.2);
 
   --cs-nav-height:    64px;
-  --cs-transition:    .25s cubic-bezier(.4,0,.2,1);
+  --cs-transition:    .35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* ── Base ───────────────────────────────────── */
@@ -136,8 +137,8 @@ a:hover { color: var(--cs-primary-light); }
 .btn-cs-primary:hover {
   background: var(--cs-primary-light);
   color: #fff;
-  transform: translateY(-1px);
-  box-shadow: var(--cs-shadow);
+  transform: translateY(-3px);
+  box-shadow: var(--cs-shadow-hover);
 }
 
 .btn-cs-accent {
@@ -186,8 +187,8 @@ a:hover { color: var(--cs-primary-light); }
   transition: box-shadow var(--cs-transition), transform var(--cs-transition);
 }
 .cs-card:hover {
-  box-shadow: var(--cs-shadow);
-  transform: translateY(-3px);
+  box-shadow: var(--cs-shadow-hover);
+  transform: translateY(-6px);
 }
 
 /* ── Form ───────────────────────────────────── */

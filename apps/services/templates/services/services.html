@@ -7,10 +7,10 @@
     
     <div class="row mb-5 justify-content-center">
         <div class="col-lg-6">
-            <form method="GET" action="{% url 'services' %}" class="d-flex gap-2">
-                <input type="text" name="q" class="form-control rounded-pill px-4" 
-                       placeholder="Tìm kiếm dịch vụ..." value="{{ query|default:'' }}">
-                <button class="btn btn-cs-primary rounded-pill px-4" type="submit">
+            <form method="GET" action="{% url 'services' %}" class="d-flex gap-2" id="searchForm">
+                <input type="text" name="q" id="searchInput" class="form-control rounded-pill px-4" 
+                       placeholder="Nhập tên dịch vụ để lọc nhanh..." value="{{ query|default:'' }}">
+                <button class="btn btn-cs-primary rounded-pill px-4" type="submit" id="searchBtn">
                     <i class="bi bi-search"></i>
                 </button>
             </form>
@@ -18,9 +18,9 @@
     </div>
 
     {% if services %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="servicesList">
         {% for service in services %}
-        <div class="col">
+        <div class="col service-item">
             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
                 <div class="ratio ratio-4x3">
                     {% if service.image %}
@@ -30,7 +30,7 @@
                     {% endif %}
                 </div>
                 <div class="card-body d-flex flex-column">
-                    <h5 class="fw-bold mb-3">{{ service.name }}</h5>
+                    <h5 class="fw-bold mb-3 service-name">{{ service.name }}</h5>
                     <div class="mt-auto">
                         <a href="{% url 'service_detail' service.id %}" class="btn btn-cs-outline w-100 mb-2">Xem chi tiết</a>
                         <a href="{% url 'booking_create' service.id %}" class="btn btn-cs-primary w-100">Đặt lịch</a>
@@ -47,4 +47,31 @@
     </div>
     {% endif %}
 </main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const searchForm = document.getElementById("searchForm");
+    const serviceItems = document.querySelectorAll(".service-item");
+
+    // Ngăn chặn submit form nếu muốn hoàn toàn lọc bằng JS ở client
+    searchForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+    });
+
+    searchInput.addEventListener("input", function() {
+        const query = this.value.toLowerCase().trim();
+        
+        serviceItems.forEach(function(item) {
+            const serviceName = item.querySelector(".service-name").textContent.toLowerCase();
+            // Nếu tên dịch vụ chứa chuỗi tìm kiếm thì hiển thị, ngược lại ẩn đi
+            if (serviceName.includes(query)) {
+                item.style.display = ""; // Dùng default (block)
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
