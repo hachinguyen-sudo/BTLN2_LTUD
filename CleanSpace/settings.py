@@ -136,9 +136,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Bật tính năng nén file tĩnh của WhiteNoise
-# Lưu ý: trên Django > 4.2 dùng STATICFILES_STORAGE thay vì STORAGES cho whitenoise hoặc ngược lại, 
-# nhưng từ 4.2 thì khuyến khích dùng STORAGES. Để tương thích, ta dùng STORAGES nếu được.
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
